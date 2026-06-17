@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My English Journey - 英语打卡</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        melody: {
+                            pink: '#FFB7C5',
+                            light: '#FFE4E9',
+                            deep: '#FF6B8A',
+                            cream: '#FFF5F7',
+                            lavender: '#F3E8FF'
+                        }
+                    },
+                    fontFamily: {
+                        nunito: ['Nunito', 'sans-serif'],
+                        sans: ['Noto Sans SC', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .blob {
+                border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+            }
+            .blob-alt {
+                border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+            }
+            .glass {
+                background: rgba(255, 255, 255, 0.7);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+            }
+            .floating {
+                animation: floating 3s ease-in-out infinite;
+            }
+            .floating-delay {
+                animation: floating 3s ease-in-out infinite 0.5s;
+            }
+            .floating-delay-2 {
+                animation: floating 3s ease-in-out infinite 1s;
+            }
+            .bounce-soft {
+                animation: bounceSoft 2s ease-in-out infinite;
+            }
+            .wiggle {
+                animation: wiggle 2.5s ease-in-out infinite;
+            }
+            .calendar-day {
+                aspect-ratio: 1;
+            }
+        }
+
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        @keyframes bounceSoft {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes wiggle {
+            0%, 100% { transform: rotate(-3deg); }
+            50% { transform: rotate(3deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-melody-cream via-white to-melody-lavender overflow-x-hidden">
+    <!-- 装饰性背景元素 -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden">
+        <div class="absolute top-20 -left-20 w-96 h-96 bg-melody-pink/20 blob blur-3xl"></div>
+        <div class="absolute top-60 -right-32 w-[500px] h-[500px] bg-melody-lavender/30 blob-alt blur-3xl"></div>
+        <div class="absolute bottom-20 left-1/4 w-72 h-72 bg-melody-light/40 blob blur-2xl"></div>
+    </div>
+
+    <!-- 美乐蒂装饰元素 - 左边 -->
+    <div class="fixed left-4 top-1/4 z-0 hidden lg:block">
+        <div class="text-6xl floating opacity-50 mb-8">🐰</div>
+        <div class="text-4xl floating-delay opacity-40 mb-8">🎀</div>
+        <div class="text-5xl floating-delay-2 opacity-35">🌸</div>
+    </div>
+
+    <!-- 美乐蒂装饰元素 - 右边 -->
+    <div class="fixed right-4 top-1/3 z-0 hidden lg:block">
+        <div class="text-5xl floating-delay opacity-45 mb-8">💖</div>
+        <div class="text-4xl floating opacity-40 mb-8">✨</div>
+        <div class="text-6xl floating-delay-2 opacity-50">🐰</div>
+    </div>
+
+    <!-- 美乐蒂装饰元素 - 底部 -->
+    <div class="fixed bottom-4 left-1/4 z-0 hidden lg:block">
+        <span class="text-4xl floating opacity-30">🎀</span>
+    </div>
+    <div class="fixed bottom-8 right-1/4 z-0 hidden lg:block">
+        <span class="text-5xl floating-delay opacity-35">🌸</span>
+    </div>
+
+    <!-- 主容器 -->
+    <div class="relative z-10 min-h-screen flex flex-col">
+        <!-- 导航栏 -->
+        <nav class="glass border-b border-white/50 sticky top-0 z-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 bg-gradient-to-br from-melody-pink to-melody-deep rounded-full flex items-center justify-center bounce-soft shadow-lg shadow-melody-pink/30">
+                            <span class="text-white text-xl">🐰</span>
+                        </div>
+                        <span class="font-nunito font-bold text-xl text-melody-deep tracking-tight">My English Journey</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button onclick="showAdminPanel()" class="px-3 py-2 text-sm font-medium text-purple-600 bg-purple-100 hover:bg-purple-200 rounded-full transition-all duration-300 flex items-center space-x-1" title="管理员后台">
+                            <span>🔐</span>
+                            <span class="hidden sm:inline">后台</span>
+                        </button>
+                        <button onclick="toggleStreak()" class="px-4 py-2 text-sm font-medium text-melody-deep bg-melody-light/50 hover:bg-melody-light rounded-full transition-all duration-300 flex items-center space-x-2">
+                            <span>🔥</span>
+                            <span id="streakCount">0</span>
+                            <span>天</span>
+                        </button>
+                        <button onclick="syncToCloud()" class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-melody-pink to-melody-deep rounded-full hover:shadow-lg hover:shadow-melody-pink/30 transition-all duration-300 transform hover:scale-105">
+                            <span class="flex items-center space-x-2">
+                                <span>☁️</span>
+                                <span>同步打卡</span>
+                            </span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主要内容区 -->
+        <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <!-- 头部欢迎区 -->
+            <div class="text-center mb-16">
+                <div class="inline-block mb-6">
+                    <div class="relative">
+                        <h1 class="font-nunito text-5xl md:text-6xl font-extrabold bg-gradient-to-r from-melody-deep via-melody-pink to-purple-400 bg-clip-text text-transparent">
+                            Hello, English Learner!
+                        </h1>
+                        <div class="absolute -top-4 -right-8 text-3xl floating">✨</div>
+                        <div class="absolute -bottom-2 -left-6 text-2xl floating-delay">🐰</div>
+                    </div>
+                </div>
+                <p class="text-lg text-gray-600 max-w-2xl mx-auto mb-8">
+                    每天进步一点点，记录你的英语学习旅程。让美乐蒂陪你一起成长！
+                </p>
+
+                <!-- 统计卡片 -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+                    <div class="glass rounded-3xl p-6 border border-white/60 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+                        <div class="text-4xl mb-3">📚</div>
+                        <div class="text-3xl font-nunito font-bold text-melody-deep" id="totalWords">0</div>
+                        <div class="text-sm text-gray-500 mt-1">累计学习单词</div>
+                    </div>
+                    <div class="glass rounded-3xl p-6 border border-white/60 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+                        <div class="text-4xl mb-3">⏱️</div>
+                        <div class="text-3xl font-nunito font-bold text-melody-deep" id="totalMinutes">0</div>
+                        <div class="text-sm text-gray-500 mt-1">今日学习分钟</div>
+                    </div>
+                    <div class="glass rounded-3xl p-6 border border-white/60 shadow-xl hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2">
+                        <div class="text-4xl mb-3">🏆</div>
+                        <div class="text-3xl font-nunito font-bold text-melody-deep" id="totalDays">0</div>
+                        <div class="text-sm text-gray-500 mt-1">坚持打卡天数</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 打卡日历和日程表区域 -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+                <!-- 打卡日历 -->
+                <div class="glass rounded-3xl p-8 border border-white/60 shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-2 right-2 text-3xl floating opacity-30">🎀</div>
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-gray-800 flex items-center space-x-2">
+                            <span>📅</span>
+                            <span>打卡日历</span>
+                        </h2>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="prevMonth()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-melody-light transition-colors">
+                                ←
+                            </button>
+                            <span id="currentMonth" class="font-medium text-melody-deep min-w-[120px] text-center">2026年6月</span>
+                            <button onclick="nextMonth()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-melody-light transition-colors">
+                                →
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 日历表头 -->
+                    <div class="grid grid-cols-7 gap-1 mb-2">
+                        <div class="text-center text-sm font-medium text-gray-500 py-2">日</div>
+                        <div class="text-center text-sm font-medium text-gray-500 py-2">一</div>
+                        <div class="text-center text-sm font-medium text-gray-500 py-2">二</div>
+                        <div class="text-center text-sm font-medium text-gray-500 py-2">三</div>
+                        <div class="text-center text-sm font-medium text-gray-500 py-2">四</div>
+                        <div class="text-center text-sm font-medium text-gray-500 py-2">五</div>
+                        <div class="text-center text-sm font-medium text-gray-500 py-2">六</div>
+                    </div>
+
+                    <!-- 日历主体 -->
+                    <div id="calendarGrid" class="grid grid-cols-7 gap-1">
+                        <!-- 日期将通过JS动态生成 -->
+                    </div>
+
+                    <!-- 图例 -->
+                    <div class="flex items-center justify-center space-x-6 mt-6 pt-4 border-t border-melody-light/50">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-gradient-to-br from-melody-pink to-melody-deep"></div>
+                            <span class="text-sm text-gray-600">已打卡</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-melody-light border-2 border-melody-pink"></div>
+                            <span class="text-sm text-gray-600">今天</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-4 h-4 rounded-full bg-white border border-gray-200"></div>
+                            <span class="text-sm text-gray-600">未打卡</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 日程表 -->
+                <div class="glass rounded-3xl p-8 border border-white/60 shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-2 right-2 text-3xl floating-delay opacity-30">🐰</div>
+                    <div class="flex items-center justify-between mb-6">
+                        <h2 class="text-xl font-bold text-gray-800 flex items-center space-x-2">
+                            <span>📋</span>
+                            <span>学习日程</span>
+                        </h2>
+                        <button onclick="showAddScheduleModal()" class="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-melody-pink to-melody-deep rounded-xl hover:shadow-lg transition-all duration-300">
+                            + 添加日程
+                        </button>
+                    </div>
+
+                    <!-- 日程列表 -->
+                    <div id="scheduleList" class="space-y-3 max-h-[400px] overflow-y-auto">
+                        <!-- 日程将通过JS动态生成 -->
+                    </div>
+
+                    <!-- 空状态 -->
+                    <div id="scheduleEmptyState" class="text-center py-12">
+                        <div class="text-5xl mb-4 floating">🐰📝</div>
+                        <p class="text-gray-500">还没有添加学习日程</p>
+                        <p class="text-gray-400 text-sm mt-1">点击上方按钮开始规划吧！</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 打卡表单区 -->
+            <div class="max-w-2xl mx-auto mb-16">
+                <div class="glass rounded-3xl p-8 border border-white/60 shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-4 right-4 text-4xl floating opacity-25">💖</div>
+                    <div class="absolute bottom-4 left-4 text-4xl floating-delay opacity-25">🌸</div>
+                    <div class="text-center mb-8">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-2 flex items-center justify-center space-x-2">
+                            <span>🎀</span>
+                            <span>今日打卡</span>
+                            <span>🎀</span>
+                        </h2>
+                        <p class="text-gray-500">记录你今天的英语学习成果</p>
+                    </div>
+
+                    <form id="checkinForm" class="space-y-6">
+                        <!-- 学习时长 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">⏰ 学习时长（分钟）</label>
+                            <input type="number" id="studyMinutes" min="1" max="480" placeholder="例如：60"
+                                class="w-full px-5 py-4 rounded-2xl border-2 border-melody-light bg-white/70 focus:border-melody-pink focus:ring-4 focus:ring-melody-pink/20 outline-none transition-all duration-300 text-gray-800 placeholder-gray-400">
+                        </div>
+
+                        <!-- 学习内容 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">📖 学习内容</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-3">
+                                <button type="button" onclick="selectCategory('vocabulary')" class="category-btn px-4 py-3 rounded-xl border-2 border-melody-light bg-white/70 hover:bg-melody-light hover:border-melody-pink transition-all duration-300 text-sm font-medium text-gray-700">
+                                    📝 单词
+                                </button>
+                                <button type="button" onclick="selectCategory('reading')" class="category-btn px-4 py-3 rounded-xl border-2 border-melody-light bg-white/70 hover:bg-melody-light hover:border-melody-pink transition-all duration-300 text-sm font-medium text-gray-700">
+                                    📚 阅读
+                                </button>
+                                <button type="button" onclick="selectCategory('listening')" class="category-btn px-4 py-3 rounded-xl border-2 border-melody-light bg-white/70 hover:bg-melody-light hover:border-melody-pink transition-all duration-300 text-sm font-medium text-gray-700">
+                                    🎧 听力
+                                </button>
+                                <button type="button" onclick="selectCategory('speaking')" class="category-btn px-4 py-3 rounded-xl border-2 border-melody-light bg-white/70 hover:bg-melody-light hover:border-melody-pink transition-all duration-300 text-sm font-medium text-gray-700">
+                                    🗣️ 口语
+                                </button>
+                                <button type="button" onclick="selectCategory('writing')" class="category-btn px-4 py-3 rounded-xl border-2 border-melody-light bg-white/70 hover:bg-melody-light hover:border-melody-pink transition-all duration-300 text-sm font-medium text-gray-700">
+                                    ✍️ 写作
+                                </button>
+                                <button type="button" onclick="selectCategory('grammar')" class="category-btn px-4 py-3 rounded-xl border-2 border-melody-light bg-white/70 hover:bg-melody-light hover:border-melody-pink transition-all duration-300 text-sm font-medium text-gray-700">
+                                    📐 语法
+                                </button>
+                            </div>
+                            <textarea id="studyContent" rows="4" placeholder="今天学了什么？比如：背诵了50个单词，完成了一篇阅读理解..."
+                                class="w-full px-5 py-4 rounded-2xl border-2 border-melody-light bg-white/70 focus:border-melody-pink focus:ring-4 focus:ring-melody-pink/20 outline-none transition-all duration-300 text-gray-800 placeholder-gray-400 resize-none"></textarea>
+                        </div>
+
+                        <!-- 心情打卡 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-3">😊 今天的学习心情</label>
+                            <div class="flex justify-center space-x-4">
+                                <button type="button" onclick="selectMood('great')" class="mood-btn text-4xl transform hover:scale-125 transition-all duration-300 p-2 rounded-2xl" title="太棒了！">
+                                    🥰
+                                </button>
+                                <button type="button" onclick="selectMood('good')" class="mood-btn text-4xl transform hover:scale-125 transition-all duration-300 p-2 rounded-2xl" title="还不错">
+                                    😊
+                                </button>
+                                <button type="button" onclick="selectMood('normal')" class="mood-btn text-4xl transform hover:scale-125 transition-all duration-300 p-2 rounded-2xl" title="一般般">
+                                    😐
+                                </button>
+                                <button type="button" onclick="selectMood('tired')" class="mood-btn text-4xl transform hover:scale-125 transition-all duration-300 p-2 rounded-2xl" title="有点累">
+                                    😴
+                                </button>
+                                <button type="button" onclick="selectMood('challenging')" class="mood-btn text-4xl transform hover:scale-125 transition-all duration-300 p-2 rounded-2xl" title="有点难">
+                                    😓
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 提交按钮 -->
+                        <button type="submit" class="w-full py-4 bg-gradient-to-r from-melody-pink to-melody-deep text-white font-bold rounded-2xl shadow-lg shadow-melody-pink/30 hover:shadow-xl hover:shadow-melody-pink/40 transform hover:scale-[1.02] transition-all duration-300 flex items-center justify-center space-x-2">
+                            <span>🐰</span>
+                            <span>完成打卡！</span>
+                            <span>✨</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- 最近打卡记录 -->
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center justify-between mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 flex items-center space-x-2">
+                        <span>📜</span>
+                        <span>最近打卡记录</span>
+                    </h2>
+                    <button onclick="exportData()" class="text-sm text-melody-deep hover:text-melody-pink transition-colors flex items-center space-x-1">
+                        <span>导出数据</span>
+                        <span>→</span>
+                    </button>
+                </div>
+
+                <div id="recordsList" class="space-y-4">
+                    <!-- 记录将通过JS动态生成 -->
+                </div>
+
+                <!-- 空状态 -->
+                <div id="emptyState" class="text-center py-16">
+                    <div class="text-6xl mb-4 floating">🐰💭</div>
+                    <p class="text-gray-500 text-lg">还没有打卡记录，开始你的第一次吧！</p>
+                    <p class="text-gray-400 text-sm mt-2">美乐蒂在等你哦～</p>
+                </div>
+            </div>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="glass border-t border-white/50 py-8">
+            <div class="max-w-7xl mx-auto px-4 text-center">
+                <div class="flex items-center justify-center space-x-2 mb-4">
+                    <span class="text-2xl">🎀</span>
+                    <span class="font-nunito font-bold text-melody-deep">My English Journey</span>
+                    <span class="text-2xl">🎀</span>
+                </div>
+                <p class="text-gray-500 text-sm">Made with 💖 for English learners</p>
+                <p class="text-gray-400 text-xs mt-2">支持坚果云、OneDrive、Google Drive等云存储同步</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- 成功提示模态框 -->
+    <div id="successModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeModal()"></div>
+        <div class="relative glass rounded-3xl p-8 border border-white/60 shadow-2xl max-w-md mx-4 transform scale-95 opacity-0 transition-all duration-300" id="modalContent">
+            <div class="text-center">
+                <div class="text-6xl mb-4 bounce-soft">🎉</div>
+                <h3 class="text-2xl font-bold text-gray-800 mb-2">打卡成功！</h3>
+                <p class="text-gray-600 mb-6">太棒了！你又向英语大师迈进了一步！</p>
+                <div class="flex justify-center space-x-3">
+                    <button onclick="closeModal()" class="px-6 py-3 bg-gradient-to-r from-melody-pink to-melody-deep text-white font-medium rounded-xl hover:shadow-lg transition-all duration-300">
+                        继续努力
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 添加日程模态框 -->
+    <div id="addScheduleModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeScheduleModal()"></div>
+        <div class="relative glass rounded-3xl p-8 border border-white/60 shadow-2xl max-w-lg mx-4 w-full transform scale-95 opacity-0 transition-all duration-300" id="scheduleModalContent">
+            <div class="text-center mb-6">
+                <div class="text-4xl mb-2">📝</div>
+                <h3 class="text-xl font-bold text-gray-800">添加学习日程</h3>
+            </div>
+
+            <form id="scheduleForm" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">📅 日期</label>
+                    <input type="date" id="scheduleDate" required
+                        class="w-full px-4 py-3 rounded-xl border-2 border-melody-light bg-white/70 focus:border-melody-pink focus:ring-4 focus:ring-melody-pink/20 outline-none transition-all duration-300">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">🕐 开始时间</label>
+                        <input type="time" id="scheduleStartTime" required
+                            class="w-full px-4 py-3 rounded-xl border-2 border-melody-light bg-white/70 focus:border-melody-pink focus:ring-4 focus:ring-melody-pink/20 outline-none transition-all duration-300">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">🕐 结束时间</label>
+                        <input type="time" id="scheduleEndTime" required
+                            class="w-full px-4 py-3 rounded-xl border-2 border-melody-light bg-white/70 focus:border-melody-pink focus:ring-4 focus:ring-melody-pink/20 outline-none transition-all duration-300">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">📖 学习内容</label>
+                    <input type="text" id="scheduleTitle" placeholder="例如：背诵50个单词" required
+                        class="w-full px-4 py-3 rounded-xl border-2 border-melody-light bg-white/70 focus:border-melody-pink focus:ring-4 focus:ring-melody-pink/20 outline-none transition-all duration-300">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">📌 类别</label>
+                    <select id="scheduleCategory"
+                        class="w-full px-4 py-3 rounded-xl border-2 border-melody-light bg-white/70 focus:border-melody-pink focus:ring-4 focus:ring-melody-pink/20 outline-none transition-all duration-300">
+                        <option value="vocabulary">📝 单词</option>
+                        <option value="reading">📚 阅读</option>
+                        <option value="listening">🎧 听力</option>
+                        <option value="speaking">🗣️ 口语</option>
+                        <option value="writing">✍️ 写作</option>
+                        <option value="grammar">📐 语法</option>
+                        <option value="other">📖 其他</option>
+                    </select>
+                </div>
+
+                <div class="flex space-x-3 pt-4">
+                    <button type="button" onclick="closeScheduleModal()" class="flex-1 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-all duration-300">
+                        取消
+                    </button>
+                    <button type="submit" class="flex-1 py-3 bg-gradient-to-r from-melody-pink to-melody-deep text-white font-medium rounded-xl hover:shadow-lg transition-all duration-300">
+                        添加
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 后台管理面板模态框 -->
+    <div id="adminModal" class="fixed inset-0 z-50 flex items-center justify-center hidden">
+        <div class="absolute inset-0 bg-black/20 backdrop-blur-sm" onclick="closeAdminModal()"></div>
+        <div class="relative glass rounded-3xl p-8 border border-white/60 shadow-2xl max-w-4xl mx-4 w-full max-h-[90vh] overflow-y-auto transform scale-95 opacity-0 transition-all duration-300" id="adminModalContent">
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center space-x-3">
+                    <div class="text-4xl">🔐</div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">管理员后台</h3>
+                        <p class="text-sm text-gray-500">查看完整的学习数据统计</p>
+                    </div>
+                </div>
+                <button onclick="closeAdminModal()" class="text-gray-400 hover:text-gray-600 text-2xl">×</button>
+            </div>
+
+            <!-- 数据概览卡片 -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-gradient-to-br from-pink-50 to-pink-100 rounded-2xl p-4 text-center">
+                    <div class="text-3xl mb-2">📝</div>
+                    <div class="text-2xl font-nunito font-bold text-melody-deep" id="adminTotalRecords">0</div>
+                    <div class="text-sm text-gray-500">总打卡次数</div>
+                </div>
+                <div class="bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl p-4 text-center">
+                    <div class="text-3xl mb-2">⏰</div>
+                    <div class="text-2xl font-nunito font-bold text-purple-600" id="adminTotalMinutes">0</div>
+                    <div class="text-sm text-gray-500">总学习分钟</div>
+                </div>
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl p-4 text-center">
+                    <div class="text-3xl mb-2">📅</div>
+                    <div class="text-2xl font-nunito font-bold text-blue-600" id="adminTotalDays">0</div>
+                    <div class="text-sm text-gray-500">学习天数</div>
+                </div>
+                <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-2xl p-4 text-center">
+                    <div class="text-3xl mb-2">🔥</div>
+                    <div class="text-2xl font-nunito font-bold text-green-600" id="adminStreak">0</div>
+                    <div class="text-sm text-gray-500">连续打卡</div>
+                </div>
+            </div>
+
+            <!-- 类别统计 -->
+            <div class="mb-8">
+                <h4 class="font-bold text-gray-700 mb-4 flex items-center space-x-2">
+                    <span>📊</span>
+                    <span>学习类别分布</span>
+                </h4>
+                <div id="categoryStats" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <!-- 类别统计将通过JS动态生成 -->
+                </div>
+            </div>
+
+            <!-- 心情统计 -->
+            <div class="mb-8">
+                <h4 class="font-bold text-gray-700 mb-4 flex items-center space-x-2">
+                    <span>😊</span>
+                    <span>学习心情统计</span>
+                </h4>
+                <div id="moodStats" class="grid grid-cols-5 gap-3">
+                    <!-- 心情统计将通过JS动态生成 -->
+                </div>
+            </div>
+
+            <!-- 最近的所有记录 -->
+            <div>
+                <h4 class="font-bold text-gray-700 mb-4 flex items-center space-x-2">
+                    <span>📋</span>
+                    <span>所有打卡记录</span>
+                    <span class="text-sm font-normal text-gray-500">（<span id="adminRecordCount">0</span>条）</span>
+                </h4>
+                <div id="adminRecordsList" class="space-y-3 max-h-80 overflow-y-auto">
+                    <!-- 记录将通过JS动态生成 -->
+                </div>
+            </div>
+
+            <!-- 快捷操作 -->
+            <div class="mt-8 pt-6 border-t border-melody-light/50">
+                <h4 class="font-bold text-gray-700 mb-4 flex items-center space-x-2">
+                    <span>⚙️</span>
+                    <span>数据管理</span>
+                </h4>
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="exportData()" class="px-4 py-2 bg-blue-100 text-blue-600 rounded-xl hover:bg-blue-200 transition-all duration-300 text-sm">
+                        📥 导出数据
+                    </button>
+                    <button onclick="clearAllData()" class="px-4 py-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200 transition-all duration-300 text-sm">
+                        🗑️ 清空所有数据
+                    </button>
+                    <button onclick="generateSampleData()" class="px-4 py-2 bg-green-100 text-green-600 rounded-xl hover:bg-green-200 transition-all duration-300 text-sm">
+                        🧪 生成示例数据
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 状态管理
+        let selectedCategory = null;
+        let selectedMood = null;
+        let checkinRecords = JSON.parse(localStorage.getItem('checkinRecords') || '[]');
+        let schedules = JSON.parse(localStorage.getItem('schedules') || '[]');
+        let streak = parseInt(localStorage.getItem('streak') || '0');
+
+        // 当前日历月份（从2026年6月开始）
+        let currentYear = 2026;
+        let currentMonth = 5; // 0-based, 5 = June
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            renderCalendar();
+            renderSchedules();
+            renderRecords();
+            updateStats();
+            document.getElementById('streakCount').textContent = streak;
+
+            // 设置默认日期为今天
+            const today = new Date();
+            document.getElementById('scheduleDate').value = today.toISOString().split('T')[0];
+            document.getElementById('scheduleStartTime').value = '09:00';
+            document.getElementById('scheduleEndTime').value = '10:00';
+        });
+
+        // 渲染日历
+        function renderCalendar() {
+            const calendarGrid = document.getElementById('calendarGrid');
+            const monthLabel = document.getElementById('currentMonth');
+
+            // 更新月份显示
+            monthLabel.textContent = `${currentYear}年${currentMonth + 1}月`;
+
+            // 获取当月第一天
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            // 获取当月最后一天
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            // 第一天是星期几
+            const startDayOfWeek = firstDay.getDay();
+            // 当月总天数
+            const daysInMonth = lastDay.getDate();
+
+            // 获取已打卡的日期集合
+            const checkedDates = new Set(
+                checkinRecords.map(r => new Date(r.timestamp).toDateString())
+            );
+
+            // 获取今天
+            const today = new Date();
+            const todayDateString = today.toDateString();
+
+            let calendarHTML = '';
+
+            // 添加上个月的占位日期
+            for (let i = 0; i < startDayOfWeek; i++) {
+                calendarHTML += `<div class="calendar-day"></div>`;
+            }
+
+            // 添加当月日期
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(currentYear, currentMonth, day);
+                const dateString = date.toDateString();
+                const isChecked = checkedDates.has(dateString);
+                const isToday = dateString === todayDateString;
+                const isPast = date < today;
+
+                let dayClass = 'calendar-day rounded-xl flex items-center justify-center text-sm font-medium transition-all duration-300 cursor-default ';
+
+                if (isChecked) {
+                    dayClass += 'bg-gradient-to-br from-melody-pink to-melody-deep text-white shadow-md hover:shadow-lg transform hover:scale-105';
+                } else if (isToday) {
+                    dayClass += 'bg-melody-light border-2 border-melody-pink text-melody-deep';
+                } else if (isPast) {
+                    dayClass += 'bg-white/50 text-gray-400';
+                } else {
+                    dayClass += 'bg-white/50 text-gray-600 hover:bg-melody-light/50';
+                }
+
+                const checkEmoji = isChecked ? '✓' : '';
+
+                calendarHTML += `
+                    <div class="${dayClass}" title="${isChecked ? '已打卡' : (isToday ? '今天' : '')}">
+                        <div class="text-center">
+                            <div>${day}</div>
+                            ${isChecked ? `<div class="text-xs">${checkEmoji}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+            }
+
+            calendarGrid.innerHTML = calendarHTML;
+        }
+
+        // 上个月
+        function prevMonth() {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        }
+
+        // 下个月
+        function nextMonth() {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        }
+
+        // 显示添加日程模态框
+        function showAddScheduleModal() {
+            const modal = document.getElementById('addScheduleModal');
+            const content = document.getElementById('scheduleModalContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        // 关闭日程模态框
+        function closeScheduleModal() {
+            const modal = document.getElementById('addScheduleModal');
+            const content = document.getElementById('scheduleModalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                document.getElementById('scheduleForm').reset();
+            }, 300);
+        }
+
+        // 提交日程表单
+        document.getElementById('scheduleForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const schedule = {
+                id: Date.now(),
+                date: document.getElementById('scheduleDate').value,
+                startTime: document.getElementById('scheduleStartTime').value,
+                endTime: document.getElementById('scheduleEndTime').value,
+                title: document.getElementById('scheduleTitle').value,
+                category: document.getElementById('scheduleCategory').value,
+                completed: false,
+                createdAt: new Date().toISOString()
+            };
+
+            schedules.push(schedule);
+            schedules.sort((a, b) => {
+                if (a.date !== b.date) return a.date.localeCompare(b.date);
+                return a.startTime.localeCompare(b.startTime);
+            });
+            localStorage.setItem('schedules', JSON.stringify(schedules));
+
+            closeScheduleModal();
+            renderSchedules();
+        });
+
+        // 渲染日程列表
+        function renderSchedules() {
+            const scheduleList = document.getElementById('scheduleList');
+            const emptyState = document.getElementById('scheduleEmptyState');
+
+            if (schedules.length === 0) {
+                scheduleList.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            const categoryLabels = {
+                vocabulary: '📝 单词',
+                reading: '📚 阅读',
+                listening: '🎧 听力',
+                speaking: '🗣️ 口语',
+                writing: '✍️ 写作',
+                grammar: '📐 语法',
+                other: '📖 其他'
+            };
+
+            // 按日期分组
+            const groupedSchedules = {};
+            schedules.forEach(s => {
+                if (!groupedSchedules[s.date]) {
+                    groupedSchedules[s.date] = [];
+                }
+                groupedSchedules[s.date].push(s);
+            });
+
+            const today = new Date().toISOString().split('T')[0];
+
+            scheduleList.innerHTML = Object.keys(groupedSchedules).sort().map(date => {
+                const dateObj = new Date(date);
+                const dateStr = dateObj.toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'short' });
+                const isToday = date === today;
+                const isPast = date < today;
+
+                return `
+                    <div class="mb-4">
+                        <div class="flex items-center space-x-2 mb-2">
+                            <span class="text-xs font-medium ${isToday ? 'text-melody-deep' : (isPast ? 'text-gray-400' : 'text-gray-500')}">
+                                ${isToday ? '📍 今天' : dateStr}
+                            </span>
+                            ${isPast ? '<span class="text-xs text-gray-400">（已过去）</span>' : ''}
+                        </div>
+                        <div class="space-y-2">
+                            ${groupedSchedules[date].map(s => `
+                                <div class="flex items-center p-3 rounded-xl ${s.completed ? 'bg-green-50 border border-green-200' : 'bg-white/70 border border-melody-light/50'} hover:shadow-md transition-all duration-300">
+                                    <button onclick="toggleSchedule(${s.id})" class="flex-shrink-0 w-5 h-5 rounded-full border-2 ${s.completed ? 'bg-green-400 border-green-400' : 'border-melody-pink'} mr-3 flex items-center justify-center transition-all duration-300">
+                                        ${s.completed ? '<span class="text-white text-xs">✓</span>' : ''}
+                                    </button>
+                                    <div class="flex-1 min-w-0">
+                                        <div class="flex items-center space-x-2">
+                                            <span class="text-xs text-gray-500">${s.startTime} - ${s.endTime}</span>
+                                            <span class="text-xs px-2 py-0.5 bg-melody-light text-melody-deep rounded-full">
+                                                ${categoryLabels[s.category]}
+                                            </span>
+                                        </div>
+                                        <p class="${s.completed ? 'text-gray-400 line-through' : 'text-gray-700'} text-sm truncate">${s.title}</p>
+                                    </div>
+                                    <button onclick="deleteSchedule(${s.id})" class="flex-shrink-0 text-gray-400 hover:text-red-400 transition-colors ml-2">
+                                        ×
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // 切换日程完成状态
+        function toggleSchedule(id) {
+            const schedule = schedules.find(s => s.id === id);
+            if (schedule) {
+                schedule.completed = !schedule.completed;
+                localStorage.setItem('schedules', JSON.stringify(schedules));
+                renderSchedules();
+            }
+        }
+
+        // 删除日程
+        function deleteSchedule(id) {
+            if (confirm('确定要删除这个日程吗？')) {
+                schedules = schedules.filter(s => s.id !== id);
+                localStorage.setItem('schedules', JSON.stringify(schedules));
+                renderSchedules();
+            }
+        }
+
+        // 选择学习类别
+        function selectCategory(category) {
+            selectedCategory = category;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('bg-melody-pink', 'text-white', 'border-melody-pink');
+                btn.classList.add('bg-white/70', 'text-gray-700', 'border-melody-light');
+            });
+            event.target.classList.remove('bg-white/70', 'text-gray-700', 'border-melody-light');
+            event.target.classList.add('bg-melody-pink', 'text-white', 'border-melody-pink');
+        }
+
+        // 选择心情
+        function selectMood(mood) {
+            selectedMood = mood;
+            document.querySelectorAll('.mood-btn').forEach(btn => {
+                btn.classList.remove('bg-melody-light', 'scale-125');
+            });
+            event.target.classList.add('bg-melody-light', 'scale-125');
+        }
+
+        // 表单提交
+        document.getElementById('checkinForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const minutes = document.getElementById('studyMinutes').value;
+            const content = document.getElementById('studyContent').value;
+
+            if (!minutes || !content) {
+                alert('请填写学习时长和学习内容哦～');
+                return;
+            }
+
+            const record = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }),
+                timestamp: new Date().toISOString(),
+                minutes: parseInt(minutes),
+                content: content,
+                category: selectedCategory || 'other',
+                mood: selectedMood || 'good'
+            };
+
+            checkinRecords.unshift(record);
+            localStorage.setItem('checkinRecords', JSON.stringify(checkinRecords));
+
+            // 更新连续打卡
+            streak++;
+            localStorage.setItem('streak', streak);
+            document.getElementById('streakCount').textContent = streak;
+
+            // 重置表单
+            document.getElementById('checkinForm').reset();
+            selectedCategory = null;
+            selectedMood = null;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.classList.remove('bg-melody-pink', 'text-white', 'border-melody-pink');
+                btn.classList.add('bg-white/70', 'text-gray-700', 'border-melody-light');
+            });
+            document.querySelectorAll('.mood-btn').forEach(btn => {
+                btn.classList.remove('bg-melody-light', 'scale-125');
+            });
+
+            // 显示成功弹窗
+            showModal();
+            renderRecords();
+            renderCalendar();
+            updateStats();
+        });
+
+        // 渲染打卡记录
+        function renderRecords() {
+            const recordsList = document.getElementById('recordsList');
+            const emptyState = document.getElementById('emptyState');
+
+            if (checkinRecords.length === 0) {
+                recordsList.innerHTML = '';
+                emptyState.classList.remove('hidden');
+                return;
+            }
+
+            emptyState.classList.add('hidden');
+
+            const moodEmojis = {
+                great: '🥰',
+                good: '😊',
+                normal: '😐',
+                tired: '😴',
+                challenging: '😓'
+            };
+
+            const categoryLabels = {
+                vocabulary: '📝 单词',
+                reading: '📚 阅读',
+                listening: '🎧 听力',
+                speaking: '🗣️ 口语',
+                writing: '✍️ 写作',
+                grammar: '📐 语法',
+                other: '📖 其他'
+            };
+
+            recordsList.innerHTML = checkinRecords.slice(0, 10).map(record => `
+                <div class="glass rounded-2xl p-6 border border-white/60 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-3 mb-3">
+                                <span class="text-2xl">${moodEmojis[record.mood] || '😊'}</span>
+                                <span class="text-sm font-medium text-gray-500">${record.date}</span>
+                                <span class="px-3 py-1 bg-melody-light text-melody-deep text-xs font-medium rounded-full">
+                                    ${categoryLabels[record.category] || '📖 其他'}
+                                </span>
+                            </div>
+                            <p class="text-gray-700 leading-relaxed">${record.content}</p>
+                        </div>
+                        <div class="ml-4 text-right">
+                            <div class="text-2xl font-nunito font-bold text-melody-deep">${record.minutes}</div>
+                            <div class="text-xs text-gray-500">分钟</div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 更新统计数据
+        function updateStats() {
+            const todayMinutes = checkinRecords
+                .filter(r => new Date(r.timestamp).toDateString() === new Date().toDateString())
+                .reduce((sum, r) => sum + r.minutes, 0);
+            const totalDays = checkinRecords.length;
+
+            // 动画数字
+            animateNumber('totalMinutes', todayMinutes);
+            animateNumber('totalDays', totalDays);
+        }
+
+        // 数字动画
+        function animateNumber(elementId, target) {
+            const element = document.getElementById(elementId);
+            const start = parseInt(element.textContent.replace(/,/g, ''));
+            const duration = 1000;
+            const startTime = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                const current = Math.round(start + (target - start) * easeProgress);
+                element.textContent = current.toLocaleString();
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // 显示成功弹窗
+        function showModal() {
+            const modal = document.getElementById('successModal');
+            const content = document.getElementById('modalContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            const modal = document.getElementById('successModal');
+            const content = document.getElementById('modalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // 切换连续打卡显示
+        function toggleStreak() {
+            alert(`你已经连续打卡 ${streak} 天啦！继续保持哦！ 🎉`);
+        }
+
+        // 显示后台管理面板
+        function showAdminPanel() {
+            const modal = document.getElementById('adminModal');
+            const content = document.getElementById('adminModalContent');
+            modal.classList.remove('hidden');
+            setTimeout(() => {
+                content.classList.remove('scale-95', 'opacity-0');
+                content.classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            renderAdminStats();
+        }
+
+        // 关闭后台面板
+        function closeAdminModal() {
+            const modal = document.getElementById('adminModal');
+            const content = document.getElementById('adminModalContent');
+            content.classList.remove('scale-100', 'opacity-100');
+            content.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 300);
+        }
+
+        // 渲染后台统计数据
+        function renderAdminStats() {
+            const totalMinutes = checkinRecords.reduce((sum, r) => sum + r.minutes, 0);
+            const uniqueDays = new Set(checkinRecords.map(r => new Date(r.timestamp).toDateString())).size;
+
+            document.getElementById('adminTotalRecords').textContent = checkinRecords.length;
+            document.getElementById('adminTotalMinutes').textContent = totalMinutes;
+            document.getElementById('adminTotalDays').textContent = uniqueDays;
+            document.getElementById('adminStreak').textContent = streak;
+            document.getElementById('adminRecordCount').textContent = checkinRecords.length;
+
+            // 类别统计
+            const categoryCounts = {};
+            checkinRecords.forEach(r => {
+                categoryCounts[r.category] = (categoryCounts[r.category] || 0) + 1;
+            });
+
+            const categoryLabels = {
+                vocabulary: '📝 单词',
+                reading: '📚 阅读',
+                listening: '🎧 听力',
+                speaking: '🗣️ 口语',
+                writing: '✍️ 写作',
+                grammar: '📐 语法',
+                other: '📖 其他'
+            };
+
+            const categoryColors = {
+                vocabulary: 'from-pink-100 to-pink-200',
+                reading: 'from-purple-100 to-purple-200',
+                listening: 'from-blue-100 to-blue-200',
+                speaking: 'from-green-100 to-green-200',
+                writing: 'from-yellow-100 to-yellow-200',
+                grammar: 'from-orange-100 to-orange-200',
+                other: 'from-gray-100 to-gray-200'
+            };
+
+            document.getElementById('categoryStats').innerHTML = Object.keys(categoryLabels).map(cat => `
+                <div class="bg-gradient-to-br ${categoryColors[cat]} rounded-xl p-3 text-center">
+                    <div class="text-lg font-bold text-gray-700">${categoryCounts[cat] || 0}</div>
+                    <div class="text-xs text-gray-500">${categoryLabels[cat]}</div>
+                </div>
+            `).join('');
+
+            // 心情统计
+            const moodCounts = {};
+            checkinRecords.forEach(r => {
+                moodCounts[r.mood] = (moodCounts[r.mood] || 0) + 1;
+            });
+
+            const moodEmojis = {
+                great: '🥰',
+                good: '😊',
+                normal: '😐',
+                tired: '😴',
+                challenging: '😓'
+            };
+
+            document.getElementById('moodStats').innerHTML = Object.keys(moodEmojis).map(mood => `
+                <div class="bg-gradient-to-br from-white to-gray-50 rounded-xl p-3 text-center border border-gray-100">
+                    <div class="text-2xl mb-1">${moodEmojis[mood]}</div>
+                    <div class="text-lg font-bold text-gray-700">${moodCounts[mood] || 0}</div>
+                </div>
+            `).join('');
+
+            // 所有记录列表
+            const categoryLabels2 = {
+                vocabulary: '📝 单词',
+                reading: '📚 阅读',
+                listening: '🎧 听力',
+                speaking: '🗣️ 口语',
+                writing: '✍️ 写作',
+                grammar: '📐 语法',
+                other: '📖 其他'
+            };
+
+            document.getElementById('adminRecordsList').innerHTML = checkinRecords.map(record => `
+                <div class="bg-white/70 rounded-xl p-4 border border-gray-100 hover:shadow-md transition-all duration-300">
+                    <div class="flex items-start justify-between">
+                        <div class="flex-1">
+                            <div class="flex items-center space-x-2 mb-2">
+                                <span class="text-lg">${moodEmojis[record.mood] || '😊'}</span>
+                                <span class="text-xs text-gray-500">${record.date}</span>
+                                <span class="px-2 py-0.5 bg-melody-light text-melody-deep text-xs rounded-full">
+                                    ${categoryLabels2[record.category] || '📖 其他'}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-600 line-clamp-2">${record.content}</p>
+                        </div>
+                        <div class="ml-3 text-right">
+                            <div class="text-lg font-bold text-melody-deep">${record.minutes}m</div>
+                            <button onclick="deleteRecord(${record.id})" class="text-xs text-red-400 hover:text-red-600">删除</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 删除单条记录
+        function deleteRecord(id) {
+            if (confirm('确定要删除这条打卡记录吗？')) {
+                checkinRecords = checkinRecords.filter(r => r.id !== id);
+                localStorage.setItem('checkinRecords', JSON.stringify(checkinRecords));
+                renderAdminStats();
+                renderRecords();
+                renderCalendar();
+                updateStats();
+            }
+        }
+
+        // 清空所有数据
+        function clearAllData() {
+            if (confirm('⚠️ 确定要清空所有打卡数据吗？此操作不可恢复！')) {
+                if (confirm('再次确认：真的要清空所有数据吗？')) {
+                    localStorage.removeItem('checkinRecords');
+                    localStorage.removeItem('schedules');
+                    localStorage.removeItem('streak');
+                    checkinRecords = [];
+                    schedules = [];
+                    streak = 0;
+
+                    renderCalendar();
+                    renderSchedules();
+                    renderRecords();
+                    updateStats();
+                    renderAdminStats();
+                    document.getElementById('streakCount').textContent = '0';
+
+                    alert('数据已清空！');
+                }
+            }
+        }
+
+        // 生成示例数据
+        function generateSampleData() {
+            const sampleContents = [
+                { content: '背诵了60个新单词，复习了昨天的50个', category: 'vocabulary', minutes: 45, mood: 'good' },
+                { content: '完成了一篇阅读理解，错了2题，还需要加强', category: 'reading', minutes: 30, mood: 'normal' },
+                { content: '练习了30分钟听力，VOA慢速英语', category: 'listening', minutes: 30, mood: 'great' },
+                { content: '和语伴进行了口语练习，主题是日常生活', category: 'speaking', minutes: 40, mood: 'good' },
+                { content: '写了一篇关于我的周末的英语作文，150词', category: 'writing', minutes: 35, mood: 'good' },
+                { content: '学习了现在完成时态的用法，做了20道练习题', category: 'grammar', minutes: 25, mood: 'great' },
+                { content: '复习了本周所有单词，感觉记忆效果不错', category: 'vocabulary', minutes: 50, mood: 'great' },
+                { content: '今天学习了很长时间，感觉有点累了', category: 'other', minutes: 90, mood: 'tired' },
+            ];
+
+            const today = new Date();
+            sampleContents.forEach((sample, index) => {
+                const date = new Date(today);
+                date.setDate(date.getDate() - index);
+
+                const record = {
+                    id: Date.now() - index * 1000,
+                    date: date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' }),
+                    timestamp: date.toISOString(),
+                    minutes: sample.minutes,
+                    content: sample.content,
+                    category: sample.category,
+                    mood: sample.mood
+                };
+                checkinRecords.push(record);
+            });
+
+            // 添加一些日程示例
+            const sampleSchedules = [
+                { title: '背诵日常单词', category: 'vocabulary', minutes: 30 },
+                { title: '英语听力练习', category: 'listening', minutes: 25 },
+                { title: '写一篇小作文', category: 'writing', minutes: 40 },
+            ];
+
+            sampleSchedules.forEach((s, i) => {
+                const date = new Date(today);
+                date.setDate(date.getDate() + i + 1);
+                schedules.push({
+                    id: Date.now() + i * 1000,
+                    date: date.toISOString().split('T')[0],
+                    startTime: '09:00',
+                    endTime: '10:00',
+                    title: s.title,
+                    category: s.category,
+                    completed: false,
+                    createdAt: new Date().toISOString()
+                });
+            });
+
+            localStorage.setItem('checkinRecords', JSON.stringify(checkinRecords));
+            localStorage.setItem('schedules', JSON.stringify(schedules));
+            streak = Math.min(sampleContents.length, 7);
+            localStorage.setItem('streak', streak);
+            document.getElementById('streakCount').textContent = streak;
+
+            renderCalendar();
+            renderSchedules();
+            renderRecords();
+            updateStats();
+            renderAdminStats();
+
+            alert('✅ 示例数据已生成！看看效果吧～');
+        }
+
+        // 同步到云端
+        async function syncToCloud() {
+            const data = {
+                records: checkinRecords,
+                schedules: schedules,
+                streak: streak,
+                lastSync: new Date().toISOString()
+            };
+
+            // 创建可下载的JSON文件
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `english-journey-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+
+            alert('打卡数据已导出！请上传至坚果云、OneDrive或其他云存储进行备份。\n\n💡 提示：可以设置云存储自动同步文件夹来实现自动备份哦～');
+        }
+
+        // 导出所有数据
+        function exportData() {
+            syncToCloud();
+        }
+
+        // 按ESC关闭弹窗
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeScheduleModal();
+                closeAdminModal();
+            }
+        });
+    </script>
+</body>
+</html>
